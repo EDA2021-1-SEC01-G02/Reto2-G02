@@ -60,47 +60,53 @@ def newCatalog():
     catalog['medium'] = mp.newMap(34500,
                                 maptype='PROBING',
                                 loadfactor=0.5,
-                                comparefunction=compareTagNames)
+                                comparefunction=None)
  
     return catalog
 
 
 # Funciones para agregar informacion al catalogo
 
-def addMedium(catalog, tag):
-    """
-    Agrega una relación entre un libro y un tag.
-    Para ello se adiciona el libro a la lista de libros
-    del tag.
-    """
-    bookid = tag['goodreads_book_id']
-    tagid = tag['tag_id']
-    entry = mp.get(catalog['tagIds'], tagid)
+def addArtWork(catalog, artwork):
+    lt.addLast(catalog['artworks'], artwork)
+    artists = artwork['ConstituentID'].split(',')
+    artworktitle = artwork['Title']
 
-    if entry:
-        tagbook = mp.get(catalog['tags'], me.getValue(entry)['name'])
-        tagbook['value']['total_books'] += 1
-        tagbook['value']['count'] += int(tag['count'])
-        book = mp.get(catalog['bookIds'], bookid)
-        if book:
-            lt.addLast(tagbook['value']['books'], book['value'])
+    for artist in artists:
+        addArtWorkArtist(catalog, artist.strip() , artworktitle)
+
+def addArtWorkArtist(catalog, artistname, artwork):
+    
+    artists = catalog['artists']
+    posArtist = lt.isPresent(artists, artistname)
+    if posArtist > 0:
+        artist = lt.getElement(artists, posArtist)
+    else:
+        artist = newArtist(artistname)
+        lt.addLast(artists, artist)
+    artistname = artist['name']
+
+    lt.addLast(artist['artworks'], artwork)
+
+def newArtist(name):
+    
+    artist = {
+        'name' : "",
+        'artworks' : None,
+        'info' : None,
+            }
+    artist['name'] = name
+    artist['artworks'] = lt.newList('ARRAY_LIST')
+    artist['info'] = 'x'
+    return artist
+
+
+
 
 
 
 # Funciones para creacion de datos
-def addNewMedium(name):
-    """
-    Esta estructura crea una relación entre un tag y los libros que han sido
-    marcados con dicho tag.  Se guarga el total de libros y una lista con
-    dichos libros.
-    """
-    medium = {'name': '',
-           'total_artworks': 0,
-           'artworks': None,
-           'count': 0.0}
-    medium['name'] = name
-    medium['books'] = lt.newList()
-    return medium
+
 
 # Funciones de consulta
 
@@ -118,7 +124,7 @@ def compareArtworks(artwork1, artwork2):
     else:
         return -1
 
-def compareTagNames(name, medium):
+def compareMediumNames(name, medium):
     tagentry = me.getKey(medium)
     if (name == tagentry):
         return 0
