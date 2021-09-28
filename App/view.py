@@ -51,7 +51,7 @@ while True:
         print("Cargando información de los archivos ....")
 
     elif int(inputs[0]) == 2:
-        pass
+        pass 
 
     else:
         sys.exit(0)
