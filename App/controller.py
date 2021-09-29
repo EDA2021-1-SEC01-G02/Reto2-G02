@@ -20,6 +20,7 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+
 import config as cf
 import model
 import csv
@@ -43,7 +44,18 @@ def loadArtWorks(catalog):
     input_file = csv.DictReader(open(artworksfile, encoding = 'utf-8'))
     for artwork in input_file:
         model.addArtWork(catalog, artwork)
+        model.addMedium(catalog['medium'], artwork)
 
 # Funciones de ordenamiento
 
+def sortArtworksByDate(map, key):
+    lst = model.onlyMapValue(map, key)
+    model.sortArtworksByDate(lst, 'cmpArtworksByDate')
+
 # Funciones de consulta sobre el catálogo
+
+def masAntic(map, len, medium):
+    sortArtworksByDate(map, medium)
+    lst = model.getMapSubList(map,medium, len)
+    for a in lst['elements']:
+        print(a)

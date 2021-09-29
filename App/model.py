@@ -30,6 +30,7 @@ from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa 
+from DISClib.Algorithms.Sorting import mergesort as ms
 assert cf
 
 """
@@ -39,15 +40,11 @@ los mismos.
 
 # Construccion de modelos
 def newCatalog():
-    """ Inicializa el catálogo de libros
+    """ Inicializa el catálogo de obras
 
-    Crea una lista vacia para guardar todos los libros
+    Crea una lista vacia para guardar las obras
 
-    Se crean indices (Maps) por los siguientes criterios:
-    Autores
-    ID libros
-    Tags
-    Año de publicacion
+    Se crean indices para los mediums
 
     Retorna el catalogo inicializado.
     """
@@ -68,52 +65,45 @@ def newCatalog():
 # Funciones para agregar informacion al catalogo
 
 def addArtWork(catalog, artwork):
+    """
+        Añade artworks
+    """
     lt.addLast(catalog['artworks'], artwork)
-    artists = artwork['ConstituentID'].split(',')
-    artworktitle = artwork['Title']
 
-    for artist in artists:
-        addArtWorkArtist(catalog, artist.strip() , artworktitle)
-
-def addArtWorkArtist(catalog, artistname, artwork):
+def addMedium(mediums, artwork):
+    """
+    Añade mediums al mapa de Mediums y agrega artworks a una lista que tiene como valor
+    """
+    mediumName = artwork['Medium']
+    if mp.contains(mediums, mediumName) == False:
+        mp.put(mediums, mediumName, lt.newList('ARRAY_LIST', None))
+    art = onlyMapValue(mediums,mediumName)
+    lt.addLast(art, artwork)
     
-    artists = catalog['artists']
-    posArtist = lt.isPresent(artists, artistname)
-    if posArtist > 0:
-        artist = lt.getElement(artists, posArtist)
-    else:
-        artist = newArtist(artistname)
-        lt.addLast(artists, artist)
-    artistname = artist['name']
-
-    lt.addLast(artist['artworks'], artwork)
-
-def newArtist(name):
-    
-    artist = {
-        'name' : "",
-        'artworks' : None,
-        'info' : None,
-            }
-    artist['name'] = name
-    artist['artworks'] = lt.newList('ARRAY_LIST')
-    artist['info'] = 'x'
-    return artist
-
-
-
-
-
 
 # Funciones para creacion de datos
 
-
 # Funciones de consulta
+
+def onlyMapValue(map, key):
+    """
+    Se encarga de buscar el valor de un par, dado el mapa y la llave
+    """
+    pair =  mp.get(map,key)
+    return me.getValue(pair)
+
+def getMapSubList(map,medium, len):
+    """
+    Crea una sublista a partir de los elementos de una lista que hay almacenada en una pareja en el mapa.
+    """
+    lst = onlyMapValue(map, medium)
+    new = lt.subList(lst,1,len)
+    return new
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 def compareArtworks(artwork1, artwork2):
     """
-    Compara dos ids de dos libros
+    Compara los codigos de los Artworks
     """
     id1 = artwork1['ObjectID'] 
     id2 = artwork2['ObjectID']
@@ -125,6 +115,13 @@ def compareArtworks(artwork1, artwork2):
         return -1
 
 def compareMediumNames(name, medium):
+
+    """
+    Compara los nombres de los Mediums,
+    devuelve 0 si son iguales, 
+    1 si el primero es mayor y 
+    -1 si es al reves
+    """
     tagentry = me.getKey(medium)
     if (name == tagentry):
         return 0
@@ -132,4 +129,31 @@ def compareMediumNames(name, medium):
         return 1
     else:
         return -1
+
+def cmpArtworkByDate(artwork1,artwork2):
+    
+    """
+    Si el primero es mayor, retorna True
+    Si no, retorna False
+    """
+
+    date1 = artwork1['Date']
+    date2 = artwork2['Date']
+    if date1 == '':
+        date1 =  0
+    if date2 == '':
+        date2 = 0
+    if int(date1) < int(date2):
+        return True
+    else:
+        return False
+
 # Funciones de ordenamiento
+
+
+def sortArtworksByDate(lst, cmpfunction):
+    """
+    Ordena una lista, dada su cmpfuntion como str
+    """
+    if 'cmpArtworksByDate' == cmpfunction:
+        ms.sort(lst, cmpArtworkByDate)

@@ -38,7 +38,7 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("2- Las n obras más antiguas para un medio específico")
 
 catalog = None
 
@@ -57,11 +57,18 @@ while True:
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
+        loadData(catalog)
         num_artworks = lt.size(catalog['artworks'])
         print('Artworks cargados: ' + str(num_artworks))
 
     elif int(inputs[0]) == 2:
-        pass 
+        medium =  input('Ingrese el medio: \n')
+        len = int(input('Ingrese el numero de obras mas antiguas a cargar:\n'))
+        mapMedium = catalog['medium']
+        print('Las %s obras mas antiguas hechas en la modalidad %s son: \n' %(len, medium))
+        controller.masAntic(mapMedium, len, medium)
+
+        
 
     else:
         sys.exit(0)
