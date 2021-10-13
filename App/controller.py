@@ -20,11 +20,9 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
-
 import config as cf
 import model
 import csv
-
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -37,6 +35,7 @@ def initCatalog():
 
 # Funciones para la carga de datos
 def loadData(catalog):
+    loadArtists(catalog)
     loadArtWorks(catalog)
 
 def loadArtWorks(catalog):
@@ -45,6 +44,13 @@ def loadArtWorks(catalog):
     for artwork in input_file:
         model.addArtWork(catalog, artwork)
         model.addMedium(catalog['medium'], artwork)
+        model.addNationality(catalog["nationality"], catalog["artists"], artwork)
+
+def loadArtists(catalog):
+    artistsfile = cf.data_dir + "MoMA/Artists-utf8-small.csv"
+    input_file = csv.DictReader(open(artistsfile, encoding= "utf-8"))
+    for artist in input_file:
+        model.addArtist(catalog,artist)
 
 # Funciones de ordenamiento
 

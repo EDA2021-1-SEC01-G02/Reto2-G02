@@ -48,16 +48,25 @@ def newCatalog():
 
     Retorna el catalogo inicializado.
     """
-    catalog = {'books': None,
+    catalog = {'artworks': None,
+               "artists" : None,
                'medium': None,
+               "nationality": None,
                }
 
     catalog['artworks'] = lt.newList('SINGLE_LINKED', compareArtworks)
+
+    catalog['artists'] = lt.newList('SINGLE_LINKED', compareArtists)
 
     catalog['medium'] = mp.newMap(34500,
                                 maptype='PROBING',
                                 loadfactor=0.5,
                                 comparefunction=None)
+
+    catalog["nationality"] = mp.newMap(34500,
+                                maptype='CHAINING',
+                                loadfactor=4,
+                                comparefunction=None)   
  
     return catalog
 
@@ -70,6 +79,12 @@ def addArtWork(catalog, artwork):
     """
     lt.addLast(catalog['artworks'], artwork)
 
+def addArtist(catalog, artist):
+    """
+        Añade artistas
+    """
+    lt.addLast(catalog["artists"], artist)
+
 def addMedium(mediums, artwork):
     """
     Añade mediums al mapa de Mediums y agrega artworks a una lista que tiene como valor
@@ -79,6 +94,24 @@ def addMedium(mediums, artwork):
         mp.put(mediums, mediumName, lt.newList('ARRAY_LIST', None))
     art = onlyMapValue(mediums,mediumName)
     lt.addLast(art, artwork)
+
+def addNationality(nationalities, artists, artwork):
+    """
+    Añade nacionalidades al mapa de Nationality y agrega artworks a una lista que tiene como valor
+    """
+    artistid = artwork["ConstituentID"].strip("[").strip("]").strip().split(",")
+    
+    for i in artistid:
+        print(i)
+        artistnat = getArtistNationality(i,artists) #Posiblemente haya que crear una funcion que recorra la lista y adquiera la nacionalidad
+        if artistnat != None: #Si encontro el artista
+            if artistnat == "": 
+                artistnat = "Unknown"
+            if mp.contains(nationalities, artistnat) == False:
+                mp.put(nationalities, artistnat, lt.newList('ARRAY_LIST', None))
+            art = onlyMapValue(nationalities, artistnat)
+            print(art)
+            lt.addLast(art, artwork)
     
 
 # Funciones para creacion de datos
@@ -100,6 +133,19 @@ def getMapSubList(map,medium, len):
     new = lt.subList(lst,1,len)
     return new
 
+def getArtistNationality(artistid,artists):
+    """Recibe por parametro el ID del artista junto con el info de los artistas y devuelve su nacionalidad"""
+    result = None #Nacionalidad del artista. Se mantendra vacio si no lo encuentra
+    num = lt.size(artists)
+    for i in range(0,num+1): #Recorre
+        temp = lt.getElement(artists,i) #Accede a los registros
+        tempid = int(temp["ConstituentID"])
+        if tempid == artistid: #Compara los ID
+            result = temp[i]["Nationality"] #Toma la nacionalidad
+            print(result)
+            break #Rompe el for
+    return result
+
 # Funciones utilizadas para comparar elementos dentro de una lista
 def compareArtworks(artwork1, artwork2):
     """
@@ -108,6 +154,19 @@ def compareArtworks(artwork1, artwork2):
     id1 = artwork1['ObjectID'] 
     id2 = artwork2['ObjectID']
     if (id1 == id2):
+        return 0
+    elif id1 > id2:
+        return 1
+    else:
+        return -1
+
+def compareArtists(artist1, artist2):
+    """
+    Compara los codigos de los artistas
+    """
+    id1 = artist1["ConstituentID"]
+    id2 = artist2["ConstituentID"]
+    if (id1==id2):
         return 0
     elif id1 > id2:
         return 1
@@ -149,7 +208,6 @@ def cmpArtworkByDate(artwork1,artwork2):
         return False
 
 # Funciones de ordenamiento
-
 
 def sortArtworksByDate(lst, cmpfunction):
     """

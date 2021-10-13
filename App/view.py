@@ -27,7 +27,6 @@ import controller
 from DISClib.ADT import list as lt
 assert cf
 
-
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -39,6 +38,7 @@ def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
     print("2- Las n obras más antiguas para un medio específico")
+    print("3- Organizar obras segun la nacionalidad de los artistas")
 
 catalog = None
 
@@ -60,6 +60,8 @@ while True:
         loadData(catalog)
         num_artworks = lt.size(catalog['artworks'])
         print('Artworks cargados: ' + str(num_artworks))
+        num_artists = lt.size(catalog["artists"])
+        print("Artistas cargados: " + str(num_artists))
 
     elif int(inputs[0]) == 2:
         medium =  input('Ingrese el medio: \n')
@@ -68,7 +70,7 @@ while True:
         print('Las %s obras mas antiguas hechas en la modalidad %s son: \n' %(len, medium))
         controller.masAntic(mapMedium, len, medium)
 
-        
+    #elif int(inputs[0]) == 3:
 
     else:
         sys.exit(0)
