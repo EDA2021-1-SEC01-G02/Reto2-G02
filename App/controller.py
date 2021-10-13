@@ -24,6 +24,8 @@ import config as cf
 import model
 import csv
 
+#import time
+
 """
 El controlador se encarga de mediar entre la vista y el modelo.
 """
@@ -41,22 +43,33 @@ def loadData(catalog):
 def loadArtWorks(catalog):
     artworksfile = cf.data_dir + 'MoMA/Artworks-utf8-small.csv'
     input_file = csv.DictReader(open(artworksfile, encoding = 'utf-8'))
+    #start_time = time.process_time()
     for artwork in input_file:
         model.addArtWork(catalog, artwork)
         model.addMedium(catalog['medium'], artwork)
         model.addNationality(catalog["nationality"], catalog["artists"], artwork)
+    #stop_time = time.process_time()
+    #print((stop_time - start_time)*1000)
+
 
 def loadArtists(catalog):
     artistsfile = cf.data_dir + "MoMA/Artists-utf8-small.csv"
     input_file = csv.DictReader(open(artistsfile, encoding= "utf-8"))
     for artist in input_file:
         model.addArtist(catalog,artist)
+    
 
 # Funciones de ordenamiento
 
 def sortArtworksByDate(map, key):
     lst = model.onlyMapValue(map, key)
     model.sortArtworksByDate(lst, 'cmpArtworksByDate')
+
+""" Trabajar para la version completa en el reto
+def sortNationalitiesByArtworksQuantity(map,key):
+    lst = model.onlyMapValue
+    model.sortNationalitiesByArtworksQuantity()
+"""
 
 # Funciones de consulta sobre el catálogo
 
@@ -65,3 +78,8 @@ def masAntic(map, len, medium):
     lst = model.getMapSubList(map,medium, len)
     for a in lst['elements']:
         print(a)
+
+def natRank(map,nationality):
+    #sortNationalitiesByArtworksQuantity(map, medium)
+    #lst = model.getMapSubList(map,medium, 10)
+    return (model.getNationalityArtworksNumber(map,nationality))

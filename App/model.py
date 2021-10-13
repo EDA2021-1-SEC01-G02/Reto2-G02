@@ -24,7 +24,6 @@
  * Dario Correal - Version inicial
  """
 
-
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -60,12 +59,12 @@ def newCatalog():
 
     catalog['medium'] = mp.newMap(34500,
                                 maptype='PROBING',
-                                loadfactor=0.5,
+                                loadfactor=0.3,
                                 comparefunction=None)
 
     catalog["nationality"] = mp.newMap(34500,
                                 maptype='CHAINING',
-                                loadfactor=4,
+                                loadfactor=2,
                                 comparefunction=None)   
  
     return catalog
@@ -102,16 +101,15 @@ def addNationality(nationalities, artists, artwork):
     artistid = artwork["ConstituentID"].strip("[").strip("]").strip().split(",")
     
     for i in artistid:
-        print(i)
-        artistnat = getArtistNationality(i,artists) #Posiblemente haya que crear una funcion que recorra la lista y adquiera la nacionalidad
-        if artistnat != None: #Si encontro el artista
-            if artistnat == "": 
-                artistnat = "Unknown"
-            if mp.contains(nationalities, artistnat) == False:
-                mp.put(nationalities, artistnat, lt.newList('ARRAY_LIST', None))
-            art = onlyMapValue(nationalities, artistnat)
-            print(art)
-            lt.addLast(art, artwork)
+        if i != "":
+            artistnat = getArtistNationality(i,artists) #Posiblemente haya que crear una funcion que recorra la lista y adquiera la nacionalidad
+            if artistnat != None: #Si encontro el artista
+                if (artistnat == ""): 
+                    artistnat = "Nationality unknown"
+                if mp.contains(nationalities, artistnat) == False:
+                    mp.put(nationalities, artistnat, lt.newList('ARRAY_LIST', None))
+                art = onlyMapValue(nationalities, artistnat)
+                lt.addLast(art, artwork)
     
 
 # Funciones para creacion de datos
@@ -139,12 +137,22 @@ def getArtistNationality(artistid,artists):
     num = lt.size(artists)
     for i in range(0,num+1): #Recorre
         temp = lt.getElement(artists,i) #Accede a los registros
-        tempid = int(temp["ConstituentID"])
+        tempid = temp["ConstituentID"]
         if tempid == artistid: #Compara los ID
-            result = temp[i]["Nationality"] #Toma la nacionalidad
-            print(result)
+            result = temp["Nationality"] #Toma la nacionalidad
             break #Rompe el for
     return result
+
+def getNationalityArtworksNumber(nationalities,nationality): #TODO: Funcion temporal del lab 6, puede borrarse para la entrega final del reto o ser modificado para que muestre en tablas.
+    """
+    Obtiene la nacionalidad en str y el map de nacionalidades. Retorna el numero de obras en esa nacionalidad.
+    """
+    result = None
+    if mp.contains(nationalities, nationality) == True:
+        temp = mp.get(nationalities,nationality)
+        result = lt.size(temp["value"])
+    return result
+    
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 def compareArtworks(artwork1, artwork2):

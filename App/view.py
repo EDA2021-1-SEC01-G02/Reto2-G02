@@ -38,7 +38,7 @@ def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
     print("2- Las n obras más antiguas para un medio específico")
-    print("3- Organizar obras segun la nacionalidad de los artistas")
+    print("3- Consultar el numero de obras de una nacionalidad")
 
 catalog = None
 
@@ -70,7 +70,15 @@ while True:
         print('Las %s obras mas antiguas hechas en la modalidad %s son: \n' %(len, medium))
         controller.masAntic(mapMedium, len, medium)
 
-    #elif int(inputs[0]) == 3:
+    #Requerimiento 4
+    elif int(inputs[0]) == 3:
+        nacionalidad = input("Digite la nacionalidad a buscar: ").capitalize()
+        resultado = controller.natRank(catalog["nationality"],nacionalidad)
+        if resultado == None:
+            print("No se encontro la nacionalidad especificada.")
+        else:
+            print("La nacionalidad "+nacionalidad+" tiene un total de obras de "+str(resultado))
+
 
     else:
         sys.exit(0)
