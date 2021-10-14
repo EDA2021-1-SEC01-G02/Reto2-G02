@@ -98,9 +98,10 @@ def addNationality(nationalities, artists, artwork):
     """
     Añade nacionalidades al mapa de Nationality y agrega artworks a una lista que tiene como valor
     """
-    artistid = artwork["ConstituentID"].strip("[").strip("]").strip().split(",")
+    artistid = artwork["ConstituentID"].split(",")
     
     for i in artistid:
+        i = i.strip("[").strip("]").strip()
         if i != "":
             artistnat = getArtistNationality(i,artists) #Posiblemente haya que crear una funcion que recorra la lista y adquiera la nacionalidad
             if artistnat != None: #Si encontro el artista
